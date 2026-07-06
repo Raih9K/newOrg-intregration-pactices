@@ -1,16 +1,22 @@
+// ProductExternalUpdateQueueable: Product external database update handler class.
+// Trigger runtime update/insert synchronization push asynchronous queue handle kore.
+// Trailhead Reference: "Asynchronous Apex" (https://trailhead.salesforce.com/content/learn/modules/asynchronous_apex)
 public with sharing class ProductExternalUpdateQueueable implements Queueable, Database.AllowsCallouts {
     
     private List<Id> productIds;
     
+    // Constructor parameter validation list setup
     public ProductExternalUpdateQueueable(List<Id> ids) {
         this.productIds = ids;
     }
     
+    // Queueable execute processing runtime method
     public void execute(QueueableContext context) {
         if (productIds == null || productIds.isEmpty()) {
             return;
         }
         
+        // Products query from record checklist
         List<Product2> products = [
             SELECT Id, Name, Description, ExternalId, Price__c, Fake_Store_Price__c, 
                    Fake_Store_Image_URL__c, Category__c, Category__r.External_Id__c 
@@ -58,7 +64,9 @@ public with sharing class ProductExternalUpdateQueueable implements Queueable, D
                 
                 req.setBody(JSON.serialize(payload));
                 
+                // POST vs PUT checking
                 if (String.isBlank(p.ExternalId)) {
+                    // Create logic on API (POST)
                     req.setEndpoint('https://api.escuelajs.co/api/v1/products');
                     req.setMethod('POST');
                     HttpResponse res = http.send(req);
@@ -90,6 +98,7 @@ public with sharing class ProductExternalUpdateQueueable implements Queueable, D
                             'POST failed — Unexpected status (' + postStatus + '): ' + res.getStatus(), postBody);
                     }
                 } else {
+                    // Update logic on API (PUT)
                     req.setEndpoint('https://api.escuelajs.co/api/v1/products/' + p.ExternalId);
                     req.setMethod('PUT');
                     HttpResponse res = http.send(req);

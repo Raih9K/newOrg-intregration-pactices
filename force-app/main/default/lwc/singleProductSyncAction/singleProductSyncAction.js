@@ -1,16 +1,21 @@
+// singleProductSyncAction: Quick Action modal implementation JavaScript component.
+// Sobe records list navigation check runtime.
+// Trailhead Reference: "Lightning Web Component Basics" (https://trailhead.salesforce.com/content/learn/modules/lightning_web_components_basics)
 import { LightningElement, api, track } from 'lwc';
 import syncSingleProduct from '@salesforce/apex/ProductListSyncController.syncSingleProduct';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { CloseActionScreenEvent } from 'lightning/actions';
 
 export default class SingleProductSyncAction extends LightningElement {
+    // Record page specific contextual variable
     @api recordId;
     @track isSyncing = true;
 
     _hasTriggered = false;
 
+    // Component load validation hook
     renderedCallback() {
-        // Defer execution until recordId is fully loaded and populated in the component
+        // Record ID complete availability state confirmation checker
         if (this.recordId && !this._hasTriggered) {
             this._hasTriggered = true;
             setTimeout(() => {
@@ -19,6 +24,7 @@ export default class SingleProductSyncAction extends LightningElement {
         }
     }
 
+    // Callout execution parameters and controller binding
     handleSync() {
         this.isSyncing = true;
         syncSingleProduct({ recordId: this.recordId })
@@ -35,6 +41,7 @@ export default class SingleProductSyncAction extends LightningElement {
             });
     }
 
+    // Alert toast display helper method
     showToast(title, message, variant) {
         this.dispatchEvent(
             new ShowToastEvent({
@@ -45,6 +52,7 @@ export default class SingleProductSyncAction extends LightningElement {
         );
     }
 
+    // Modal view window exit dispatcher action close
     closeAction() {
         this.dispatchEvent(new CloseActionScreenEvent());
     }

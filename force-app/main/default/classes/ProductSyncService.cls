@@ -1,7 +1,12 @@
+// ProductSyncService: Integration sync processor class.
+// Ekhane external API (EscuelaJS) processing, access token, products/categories import logic handle kora hoy.
+// Trailhead Reference: "Apex Integration Services" (https://trailhead.salesforce.com/content/learn/modules/apex_integration_services)
+// "Asynchronous Apex" (https://trailhead.salesforce.com/content/learn/modules/asynchronous_apex)
 public with sharing class ProductSyncService {
     
     private static final String API_BASE_URL = 'https://api.escuelajs.co/api/v1';
     
+    // Auth login API standard callout request use token retrieval
     public static String getAccessToken() {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -9,6 +14,7 @@ public with sharing class ProductSyncService {
         request.setMethod('POST');
         request.setHeader('Content-Type', 'application/json');
         
+        // Static credentials payload serialization map format
         Map<String, String> credentials = new Map<String, String>{
             'email' => 'john@mail.com',
             'password' => 'changeme'
@@ -24,6 +30,8 @@ public with sharing class ProductSyncService {
         }
     }
     
+    // Import categories and products from Escuela API.
+    // Callout sequentially first then run DML to prevent "You have uncommitted work pending" exception.
     public static void syncEscuelaProducts() {
         String token = getAccessToken();
         Http http = new Http();
@@ -50,7 +58,7 @@ public with sharing class ProductSyncService {
             throw new CalloutException('Failed to fetch products: ' + prodResponse.getStatus() + ' - ' + prodResponse.getBody());
         }
         
-        // All HTTP Callouts are complete. Processing data and performing DML:
+        // --- Shob HTTP Callouts Complete: Ekhon DML operation and data parsing run korbo ---
         List<Object> categoriesJson = (List<Object>) JSON.deserializeUntyped(catResponse.getBody());
         List<ProductCategory> categoriesToUpsert = new List<ProductCategory>();
         
@@ -92,14 +100,13 @@ public with sharing class ProductSyncService {
         List<Object> productsJson = (List<Object>) JSON.deserializeUntyped(prodResponse.getBody());
         List<Product2> productsToUpsert = new List<Product2>();
         
-        // Build list of external IDs from JSON to query existing products
         List<String> extIds = new List<String>();
         for (Object obj : productsJson) {
             Map<String, Object> prodMap = (Map<String, Object>) obj;
             extIds.add(String.valueOf(prodMap.get('id')));
         }
         
-        // Map existing products by their ExternalId to resolve upsert issues
+        // Query to match existing products based on External ID to perform updates on match
         Map<String, Product2> existingProductMap = new Map<String, Product2>();
         for (Product2 p : [SELECT Id, ExternalId FROM Product2 WHERE ExternalId IN :extIds]) {
             existingProductMap.put(p.ExternalId, p);
@@ -116,6 +123,7 @@ public with sharing class ProductSyncService {
             String imageUrl = '';
             if (imagesObj != null && !imagesObj.isEmpty()) {
                 imageUrl = String.valueOf(imagesObj[0]);
+                // Clean image URL formatting strings if parsed with array brackets
                 if (imageUrl.startsWith('["') && imageUrl.endsWith('"]')) {
                     imageUrl = imageUrl.substring(2, imageUrl.length() - 2);
                 } else if (imageUrl.startsWith('["')) {
@@ -145,7 +153,7 @@ public with sharing class ProductSyncService {
                 Status__c = 'Active'
             );
             
-            // Assign Id if the product already exists to perform update instead of insert
+            // Assign Id if the product already exists so it triggers update (saves query limits)
             if (existingProductMap.containsKey(prodId)) {
                 p.Id = existingProductMap.get(prodId).Id;
             }
@@ -163,9 +171,8 @@ public with sharing class ProductSyncService {
     }
 
     /**
-     * Queueable inner class that triggers a full bulk sync from the external API.
-     * Replaces the standalone ProductSyncQueueable wrapper class.
-     * Used by: ProductListSyncController (manual + Flow), ProductSyncEmailHandler (inbound email).
+     * Queueable class standard framework implement logic.
+     * Async mode callout support parameter `Database.AllowsCallouts` trigger rules requirement wrapper.
      */
     public class BulkSyncQueueable implements Queueable, Database.AllowsCallouts {
         public void execute(QueueableContext context) {
@@ -173,7 +180,7 @@ public with sharing class ProductSyncService {
                 ProductSyncService.syncEscuelaProducts();
             } catch (Exception ex) {
                 ErrorLogger.logException('Integration', 'Category/Product Bulk Sync', ex);
-                throw ex; // Re-throw so Salesforce job status shows as Failed
+                throw ex; // Re-throw to fail the Apex Job status
             }
         }
     }

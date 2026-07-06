@@ -1,13 +1,17 @@
+// ErrorLogger: Custom Error and Information logger class.
+// Shob transaction er messages ba faults custom object (System_Log__c) e record korar jonno use kora hoy.
+// Trailhead Reference: "Apex Database" (https://trailhead.salesforce.com/content/learn/modules/apex_database)
 public with sharing class ErrorLogger {
     
     /**
-     * Logs an error message to the System_Log__c object.
+     * Error levels database insertion handling method
      */
     public static void logError(String logType, String eventName, String message, String payload) {
         try {
             System_Log__c log = new System_Log__c(
                 Log_Type__c = logType,
                 Event_Name__c = eventName,
+                // Message character limit handling checks
                 Message__c = message != null && message.length() > 255 ? message.substring(0, 255) : message,
                 Payload__c = payload,
                 Log_Level__c = 'ERROR',
@@ -20,7 +24,7 @@ public with sharing class ErrorLogger {
     }
 
     /**
-     * Logs an info message to the System_Log__c object.
+     * Info level/Success validation logging method
      */
     public static void logInfo(String logType, String eventName, String message, String payload) {
         try {
@@ -39,7 +43,7 @@ public with sharing class ErrorLogger {
     }
 
     /**
-     * Logs a caught exception details to the System_Log__c object.
+     * Exception handling automatic logger parser
      */
     public static void logException(String logType, String eventName, Exception ex) {
         if (ex == null) return;
@@ -51,6 +55,7 @@ public with sharing class ErrorLogger {
     
     /**
      * Invocable method to allow logging errors from Flows.
+     * Flow er error element action handling method.
      */
     @InvocableMethod(label='Log Error' description='Logs an error or message to System_Log__c')
     public static void logErrorFromFlow(List<LogRequest> requests) {
@@ -75,6 +80,7 @@ public with sharing class ErrorLogger {
         }
     }
     
+    // Flow parameters input parsing helper wrapper class
     public class LogRequest {
         @InvocableVariable(label='Log Type' description='e.g., Integration, Flow' required=true)
         public String logType;
