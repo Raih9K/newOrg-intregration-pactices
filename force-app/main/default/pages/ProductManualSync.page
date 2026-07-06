@@ -1,0 +1,65 @@
+<apex:page standardController="Product2" recordSetVar="products" readOnly="true" renderAs="pdf">
+    <head>
+        <style>
+            body {
+                font-family: 'Arial Unicode MS', Arial, Helvetica, sans-serif;
+                font-size: 11px;
+            }
+            .header {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            Product Sync Catalog Export
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>External ID</th>
+                    <th>Price</th>
+                    <th>Fake Store Category</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <apex:repeat value="{!products}" var="p">
+                    <tr>
+                        <td>{!p.Name}</td>
+                        <td>{!p.ExternalId}</td>
+                        <td>
+                            <apex:outputText value="{0, number, ¤#,##0.00}">
+                                <apex:param value="{!p.Price__c}" />
+                            </apex:outputText>
+                        </td>
+                        <td>{!p.Fake_Store_Category_Name__c}</td>
+                        <td>{!p.Status__c}</td>
+                    </tr>
+                </apex:repeat>
+            </tbody>
+        </table>
+    </body>
+</apex:page>

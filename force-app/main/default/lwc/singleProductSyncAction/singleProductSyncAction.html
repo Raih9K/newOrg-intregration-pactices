@@ -1,0 +1,13 @@
+<template>
+    <div class="slds-var-p-around_medium slds-align_absolute-center" style="height: 120px; flex-direction: column; position: relative;">
+        <template if:true={isSyncing}>
+            <lightning-spinner alternative-text="Syncing product..." size="medium"></lightning-spinner>
+            <div class="slds-var-m-top_medium slds-text-title_caps">Syncing product to 3rd party API...</div>
+        </template>
+        <template if:false={isSyncing}>
+            <lightning-icon icon-name="utility:sync" size="large" alternative-text="Sync"></lightning-icon>
+            <div class="slds-var-m-top_medium">Click the button below to start synchronization.</div>
+            <lightning-button label="Sync to 3rd Party" variant="brand" onclick={handleSync} class="slds-var-m-top_medium"></lightning-button>
+        </template>
+    </div>
+</template>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Integration</fullName>
+    <active>true</active>
+    <label>Integration Log</label>
+    <picklistValues>
+        <picklist>ERP_Sync_Status__c</picklist>
+        <values>
+            <fullName>Failed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pending</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Synced</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Log_Level__c</picklist>
+        <values>
+            <fullName>ERROR</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>INFO</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>WARN</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Log_Type__c</picklist>
+        <values>
+            <fullName>Apex</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Flow</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Integration</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Integration - Incoming</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Integration - Outgoing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Validation</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

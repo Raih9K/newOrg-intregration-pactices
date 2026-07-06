@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CspTrustedSite xmlns="http://soap.sforce.com/2006/04/metadata">
+    <context>LEX</context>
+    <description>Used for Placehold.co images</description>
+    <endpointUrl>https://placehold.co</endpointUrl>
+    <isActive>true</isActive>
+    <isApplicableToImgSrc>true</isApplicableToImgSrc>
+</CspTrustedSite>

@@ -1,0 +1,15 @@
+<apex:page standardController="Product2" recordSetVar="products" lightningStylesheets="true">
+    <apex:includeLightning />
+    <div id="lightning" />
+    <script>
+        $Lightning.use("c:AllProductSyncApp", function() {
+            $Lightning.createComponent("c:allProductSync",
+                {},
+                "lightning",
+                function(cmp) {
+                    console.log("LWC component created successfully on list view VF page");
+                }
+            );
+        });
+    </script>
+</apex:page>
